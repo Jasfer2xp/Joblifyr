@@ -13,7 +13,7 @@
     <title>Document</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="<?php echo $base_url?>css/home.css">
     
 </head>
 <body>
@@ -36,7 +36,7 @@
             </nav>
 
             <div class="login">
-                <a href="#">Login</a>
+                <a href="<?php echo $base_url?>auth/login.php">Login</a>
             </div>
 
             <div class="burger" id="burger">
@@ -72,7 +72,7 @@
             <p class="hero-text">Connecting job seekers and employers through smart matching, trusted opportunities, and growth-focused careers</p>
         </div>
         <div class="hero-button">
-            <button style="background-color: red;">Click me</button>
+            <button class="btn">Get Started</button>
         </div>
     </div>
 
@@ -83,9 +83,9 @@
     <div class="animation">
         <div class="animation-container">
     </div>
-    
 </section>
-<hr>
+
+<hr class="hr1">
 <section class="hero2">
     <div class="hero2-container">
         <div class="hero2-heading">
@@ -124,6 +124,13 @@
 
 </section>
 
+<section class="section-3">
+    <div class="container-3">
+        <div class="container-inside">
+            <h1>Popular Categories</h1>
+        </div>
+    </div>
+</section>
 
 <script>
     const burger = document.getElementById("burger");

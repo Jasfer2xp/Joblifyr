@@ -87,6 +87,139 @@ a {
     font-size: 10px;
     padding: 2px 6px;
     border-radius: 10px;
+    position: relative;
+    bottom: 2px;
+}
+
+@media (max-width: 1400px) {
+    .hero{
+        height: 65vh;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        grid-template-rows: repeat(5, 1fr);
+        gap: 8px;
+        max-width: 1000px;
+        margin: auto;
+        justify-content: space-between;
+        display: flex;
+    }
+    .div1{
+        margin-left: 50px;
+    }
+
+    .div2{
+        margin-right: 50px;
+
+    }
+}
+
+@media (max-width: 1200px) {
+    .div1{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin-left: 0px;
+    }
+
+    .hero-button{ 
+        margin-bottom: 20px;
+        margin-top: -10px;
+    }
+    .hero-title{
+        font-size: 20px;
+        max-width: 300px;
+        margin: 0 auto;
+        justify-content: center;
+        text-align: center;
+    }
+    .hero{
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .hero-text{
+        text-align: center;
+        margin: 0 auto;
+        max-width: 400px;
+        margin-bottom: 50px;
+    }
+
+    .img-container{
+
+        margin: auto;
+    }
+
+    .div2{
+        margin-right: 50px;
+
+    }
+
+
+    .hr1{
+        height: 0vh;
+        margin-top: 350px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .div1{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .hero-button{ 
+        margin-bottom: 20px;
+        margin-top: -10px;
+    }
+    .hero-title{
+        font-size: 20px;
+        max-width: 300px;
+        margin: 0 auto;
+        justify-content: center;
+        text-align: center;
+    }
+    .hero{
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .hero-text{
+        text-align: center;
+        margin: 0 auto;
+        max-width: 400px;
+        margin-bottom: 50px;
+    }
+
+    .img-container{
+
+        margin: auto;
+    }
+    .div1{
+        margin-left: 0px;
+    }
+
+    .div2{
+        margin-right: 0px;
+
+    }
+
+    .hr1{
+        height: 0vh;
+        margin-top: 350px;
+    }
+
+    .hero2-heading{
+        max-width: 500px;
+        text-align: center;
+    }
+
 }
 
 @media (max-width: 992px) {
@@ -102,14 +235,65 @@ a {
     .mobile-menu.active {
         display: block;
     }
+    .space{
+        height: 0vh;
+    }
+
+    .div1{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .hero-button{ 
+        margin-bottom: 20px;
+        margin-top: -10px;
+    }
+    .hero-title{
+        font-size: 20px;
+        max-width: 300px;
+        margin: 0 auto;
+        justify-content: center;
+        text-align: center;
+    }
+    .hero{
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .hero-text{
+        text-align: center;
+        margin: 0 auto;
+        max-width: 400px;
+        margin-bottom: 50px;
+    }
+
+    .img-container{
+        margin: auto;
+    }
+
+    .hr1{
+        height: 0vh;
+        margin-top: 350px;
+    }
+
+    .div1{
+        margin-left: 0px;
+    }
+
+    .div2{
+        margin-right: 0px;
+
+    }
 }
 
 .line{
     width: 800px;
     margin: auto;
 }
-
-
 
 .space{
     height: 15vh;
@@ -163,6 +347,12 @@ a {
 }
 
 
+.btn{
+    padding: 5px;
+    background-color: aqua;
+    border: 1px solid black;
+}
+
 .div2 {
     grid-row: span 3 / span 3;
     grid-column-start: 3;
@@ -189,6 +379,17 @@ a {
         height: 0vh;
     }
 
+    .div1{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .hero-button{ 
+        margin-bottom: 20px;
+        margin-top: -10px;
+    }
     .hero-title{
         font-size: 2.5rem;
         max-width: 400px;
@@ -218,6 +419,11 @@ a {
         width: 350px;
         height: 300px;
     }
+
+    .hr1{
+        height: 0vh;
+        margin-top: 50px;
+    }
 }
 
 
@@ -236,10 +442,6 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.hero2-heading{
-
 }
 
 .content-heading{
@@ -265,5 +467,11 @@ a {
     border-bottom: 2px solid black;
     border-left: 2px solid black;
     padding: 30px 0px 30px 30px;
+}
+
+.section-3{
+    height: 65vh;
+    max-width: 1300px;
+    margin: auto;
 }
      
