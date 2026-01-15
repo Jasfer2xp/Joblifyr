@@ -28,10 +28,10 @@
 
             <nav class="menu">
                 <ul class="links">
-                    <li class="list1"><a href="#">Categories</a></li>
-                    <li class="list1"><a href="#">Jobs</a></li>
-                    <li class="list1"><a href="#">About Us</a></li>
-                    <li class="list1"><a href="#">Pricing <span class="new">NEW</span></a></li>
+                    <li class="list1"><a href="<?php echo $base_url?>auth/categories.php">Categories</a></li>
+                    <li class="list1"><a href="<?php echo $base_url?>auth/hire.php">Hire Freelancer</a></li>
+                    <li class="list1"><a href="<?php echo $base_url?>auth/about.php">About Us</a></li>
+                    <li class="list1"><a href="<?php echo $base_url?>auth/pricing.php">Pricing <span class="new">NEW</span></a></li>
                 </ul>
             </nav>
 
@@ -86,42 +86,30 @@
 </section>
 
 <hr class="hr1">
-<section class="hero2">
-    <div class="hero2-container">
-        <div class="hero2-heading">
-            <h1 class="content-heading">Why Choose Joblifyr</h1>
+<section class="section-2">
+    <div class="container-2">
+        <h1 class="container-2-title">Why Choose Joblifyr</h1> 
+        <div class="container-2-head">
+            <div class="container-2-head-1">
+                <h5>
+                    <input class="input" type="checkbox" checked disabled>Built to simplify job searching and hiring for everyone
+                </h5>
+                <h5>
+                    <input class="input" type="checkbox" checked disabled>Joblifyr removes the noise and connects people to real opportunities
+                </h5>
+                <h5>
+                    <input class="input" type="checkbox" checked disabled>Everything You Need in One Job Platform
+                </h5>
+                <h5>
+                    <input class="input" type="checkbox" checked disabled>A Smarter Way to Find Jobs and Hire Talent
+                </h5>
+                <h5>
+                    <input class="input" type="checkbox" checked disabled>Finding the Right Job Shouldn’t Be Hard
+                </h5>
+            </div>
+            <img class="img-work" src="<?php echo $base_url?>images/person1.png" alt="">
         </div>
     </div>
-
-    <div class="content2">
-        <div class="content2-container">
-            <ul class="wrap-list">
-                <li>Smart job matching based on skills and experience</li>
-                <li>Fast and easy applications with fewer steps</li>
-                <li>Verified employers and trusted job opportunities</li>
-                <li>A clean, user-friendly platform built for modern careers</li>
-            </ul>
-            <ul class="wrap-list">
-                <li>Smart job matching based on skills and experience</li>
-                <li>Fast and easy applications with fewer steps</li>
-                <li>Verified employers and trusted job opportunities</li>
-                <li>A clean, user-friendly platform built for modern careers</li>
-            </ul>
-            <ul class="wrap-list">
-                <li>Smart job matching based on skills and experience</li>
-                <li>Fast and easy applications with fewer steps</li>
-                <li>Verified employers and trusted job opportunities</li>
-                <li>A clean, user-friendly platform built for modern careers</li>
-            </ul>
-            <ul class="wrap-list">
-                <li>Smart job matching based on skills and experience</li>
-                <li>Fast and easy applications with fewer steps</li>
-                <li>Verified employers and trusted job opportunities</li>
-                <li>A clean, user-friendly platform built for modern careers</li>
-            </ul>
-        </div>
-    </div>
-
 </section>
 
 <section class="section-3">
