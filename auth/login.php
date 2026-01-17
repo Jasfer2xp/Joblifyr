@@ -1,32 +1,12 @@
 <?php
-  require_once __DIR__ . '/../config/config.php';
-  require_once __DIR__ . '/../config/database.php';
 
-  session_start();
+define('SECURE_ACCESS', true);
 
-  $error = '';
+require_once __DIR__ . '/../config/config.php';
 
-  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+session_start();
 
-      $email = $_POST['email'];
-      $password = $_POST['password'];
-
-      $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-      $stmt->execute([$email]);
-      $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-      if ($user && password_verify($password, $user['password'])) {
-        
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['email'] = $user['email'];
-        $_SESSION['first_name'] = $user['first_name'];
-
-        header("Location: " . $base_url . "auth/newsfeed.php");
-        exit;
-      } else {
-        $error = 'Invalid email or password';
-      }
-  } 
+$csrf_token = generate_csrf_token();
 
 ?>
 <!DOCTYPE html>
@@ -34,189 +14,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login - Joblifyr</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo $base_url; ?>css/login.css">
 </head>
-    <style>
-/* From Uiverse.io by IWhat1 */ 
-.card-container {
-  width: 350px;
-  height: 440px;
-  background: transparent;
-  position: relative;
-}
-
-.container {
-  display: flex;
-  height: 100%;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
-}
-
-.circle1 {
-  height: 80px;
-  width: 80px;
-  border-radius: 50%;
-  background-color: #2879f3;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.circle2 {
-  height: 80px;
-  width: 80px;
-  border-radius: 50%;
-  background-color: #f37e10;
-  position: absolute;
-  right: 0;
-  bottom: 0;
-}
-
-.log-card {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  position: absolute;
-  width: 300px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(5px);
-  padding: 20px;
-}
-
-.heading {
-  font-size: 28px;
-  font-weight: 800;
-}
-
-.para {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.text {
-  margin-top: 15px;
-  margin-bottom: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: lightslategray;
-}
-
-.input-group {
-  margin-top: 10px;
-  margin-bottom: 4px;
-}
-
-.input {
-  box-sizing: border-box;
-  margin-bottom: 5px;
-  width: 100%;
-  border: none;
-  padding: 8px 16px;
-  background-color: transparent;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
-  border-radius: 8px;
-  font-weight: 600;
-  color: #2879f3;
-}
-
-.input:hover {
-  color: #2879f3;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
-}
-
-.password-group {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 5px;
-}
-
-.checkbox-group {
-  color: black;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.forget-password {
-  font-size: 14px;
-  font-weight: 500;
-  color: #2879f3;
-  text-decoration: none;
-}
-
-.forget-password:hover {
-  text-decoration: underline;
-  color: #f37e10;
-}
-
-.btn {
-  margin-top: 20px;
-  margin-bottom: 10px;
-  padding: 8px 16px;
-  border: none;
-  background-color: #2879f3;
-  color: white;
-  font-size: 16px;
-  font-weight: 700;
-  border-radius: 8px;
-}
-
-.btn:hover {
-  background-color: #0653c7;
-}
-
-.no-account {
-  font-size: 16px;
-  font-weight: 400;
-}
-
-.link {
-  font-weight: 800;
-  color: #2879f3;
-  cursor: pointer;
-}
-
-.link:hover {
-  color: #f37e10;
-  text-decoration: underline;
-}
-    </style>
 <body>
 
-<div class="card-container">
-    <div class="circle1"></div>
-    <div class="circle2"></div>
-    <div class="container">
-        <div class="log-card">
-    <p class="heading">Welcome Back</p>
-    <p>We are you to have you Again</p>
-<form action="" method="post">
-    <div class="input-group">
-      <?php if($error): ?>
-        <p style="color:red; font-weight:bold;"><?php echo $error; ?></p>
-      <?php endif; ?>
-
-        <p class="text">Username</p>
-        <input class="input" name="email" type="email" placeholder="gwapoko@gmail.com">
-        <p class="text">Password</p>
-        <input class="input" name="password" type="password" placeholder="Enter Password">
-    </div>
-
-    <div class="password-group">
-        <div class="checkbox-group">
-            <input type="checkbox">
-            <label class="label">Remember Me</label>
+    <header>
+        <div class="header-container">
+            <div class="header">
+                <div class="logo">
+                    <h4>Joblifyr</h4>
+                </div>
+                <div class="back-home">
+                    <a href="<?php echo $base_url; ?>index.php">Back to Home</a>
+                </div>
+            </div>
         </div>
-            <a href="" class="forget-password">Forget Password</a>
+    </header>
+
+    <div class="login-container">
+        <div class="login-box">
+            <h1 class="login-title">Login</h1>
+            <p class="login-subtitle">Welcome back! Please login to your account.</p>
+
+            <div class="social-login">
+                <button class="social-btn google-btn" type="button">
+                    <i class="fab fa-google"></i>
+                    <span>Continue with Google</span>
+                </button>
+                <button class="social-btn linkedin-btn" type="button">
+                    <i class="fab fa-linkedin-in"></i>
+                    <span>Log in with LinkedIn</span>
+                </button>
+                <button class="social-btn twitter-btn" type="button">
+                    <i class="fab fa-x-twitter"></i>
+                    <span>Continue with X</span>
+                </button>
+            </div>
+
+            <div class="divider">
+                <span>or</span>
+            </div>
+
+            <form class="login-form" method="POST" action="<?php echo $base_url; ?>auth/process_login.php">
+                <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+                </div>
+
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Remember me</label>
+                    </div>
+                    <a href="<?php echo $base_url; ?>auth/forgot_password.php" class="forgot-password">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn-login">Login</button>
+            </form>
+
+            <div class="signup-link">
+                Don't have an account? <a href="<?php echo $base_url; ?>auth/signup.php">Sign up</a>
+            </div>
+        </div>
     </div>
 
-    <button class="btn" type="submit">Sign In</button>
-
-    <p class="no-account">Don't Have an Account ?<a class="link" href="<?php echo $base_url?>auth/register.php"> Sign Up</a></p>
-</div>
-    </div>
-</div>
-</form>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz4YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 </html>

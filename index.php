@@ -1,8 +1,10 @@
 <?php
 
-    require_once __DIR__ . '../config/config.php';
-    session_start();
+define('SECURE_ACCESS', true);
 
+require_once __DIR__ . '/config/config.php';
+
+session_start();
 
 ?>
 <!DOCTYPE html>
@@ -13,7 +15,7 @@
     <title>Document</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="<?php echo $base_url?>css/home.css">
+    <link rel="stylesheet" href="css/home.css">
     
 </head>
 <body>
