@@ -10,8 +10,8 @@ session_start();
 // legacy markup below remains in place temporarily while feature parity is
 // audited; it can be reached only by restoring this entrypoint after Laravel
 // replacements have been verified.
-if (is_file(__DIR__ . '/build/index.html')) {
-    header('Location: build/', true, 302);
+if (is_file(__DIR__ . '/dist/index.html')) {
+    header('Location: dist/', true, 302);
     exit;
 }
 

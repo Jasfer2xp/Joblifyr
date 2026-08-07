@@ -8,7 +8,7 @@ Legacy files are intentionally retained while their behaviour is audited and rep
 
 ## Frontend
 
-The redesigned React/Vite frontend lives in `resources/js`. It is responsive and uses a small component-based landing page (navigation, category cards, job cards, testimonial and CTA). The legacy root entrypoint redirects to the built React application at `/build/` while the legacy PHP pages remain intact for audit.
+The redesigned React/Vite frontend lives in `resources/js`. It is responsive and uses a small component-based landing page (navigation, category cards, job cards, testimonial and CTA). Vercel deploys the production `dist/` bundle. The legacy PHP pages remain intact for audit and are not part of the Vercel static deployment.
 
 ```powershell
 npm install
