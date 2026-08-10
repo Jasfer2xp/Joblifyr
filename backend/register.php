@@ -2,6 +2,7 @@
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../config/database.php';
     require_once __DIR__ . '/../classes/User.php';
+    require_once __DIR__ . '/send_email.php';
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         header("Location: ../auth/register.php");
@@ -19,7 +20,10 @@
         $user = new User($pdo);
         $user->register($data);
 
-        header("Location: ../auth/login.php?status=success");
+        // Send real welcome verification email via PHPMailer & Gmail App Password
+        sendWelcomeEmail($data['email'], $data['first_name']);
+
+        header("Location: ../auth/login.php?status=success&registered=" . urlencode($data['email']));
         exit;
 
     } catch (Exception $e) {

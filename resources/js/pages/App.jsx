@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { signInWithGoogle } from '../supabaseClient';
 import {
   ArrowRight,
   Briefcase,
@@ -812,7 +813,12 @@ function LoginView({ navigateTo, email, setEmail, password, setPassword, showPas
           <div className="space-y-3">
             <button
               type="button"
-              onClick={() => navigateTo('jobs')}
+              onClick={async () => {
+                const res = await signInWithGoogle();
+                if (res && res.error) {
+                  alert('Google OAuth requires Supabase Client ID & Redirect URI setup in Supabase Dashboard.');
+                }
+              }}
               className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 text-sm"
             >
               <ArrowRight size={16} className="text-indigo-600" /> Sign in with Google
@@ -1028,14 +1034,24 @@ function RegisterView({
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => navigateTo('profile')}
+                onClick={async () => {
+                  const res = await signInWithGoogle();
+                  if (res && res.error) {
+                    alert('Google OAuth requires Supabase Client ID & Redirect URI setup in Supabase Dashboard.');
+                  }
+                }}
                 className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-xs"
               >
                 <strong>G</strong> Google
               </button>
               <button
                 type="button"
-                onClick={() => navigateTo('profile')}
+                onClick={async () => {
+                  const res = await signInWithGoogle();
+                  if (res && res.error) {
+                    alert('LinkedIn OAuth coming soon. Please use Google or email registration.');
+                  }
+                }}
                 className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-xs"
               >
                 <span className="font-bold text-blue-600">in</span> LinkedIn
