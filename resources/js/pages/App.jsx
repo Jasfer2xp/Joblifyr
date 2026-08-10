@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  // Navigation active view: 'landing' | 'login' | 'register' | 'profile' | 'jobs'
+  // Active View Router: 'landing' | 'login' | 'register' | 'profile' | 'jobs'
   const [currentView, setCurrentView] = useState('landing');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -86,71 +86,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#FAF9F5] text-[#0A0F1D] flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {/* ───────────────────────────────────────────────────────────── */}
-      {/* GLOBAL SCREEN SWITCHER TOOLBAR (For Design Review & Testing) */}
-      {/* ───────────────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-50 bg-[#0B0F19] text-white py-2 px-4 shadow-md flex items-center justify-between flex-wrap gap-2 text-xs border-b border-slate-800">
-        <div className="flex items-center gap-2">
-          <span className="bg-indigo-600 text-white font-bold px-2 py-0.5 rounded text-[10px] tracking-wider uppercase">
-            Design Preview Mode
-          </span>
-          <span className="text-slate-400 hidden sm:inline">Select View:</span>
-        </div>
-        <div className="flex items-center gap-1 overflow-x-auto py-1">
-          <button
-            onClick={() => navigateTo('landing')}
-            className={`px-3 py-1 rounded-md transition font-medium whitespace-nowrap ${
-              currentView === 'landing'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-300 hover:bg-slate-800'
-            }`}
-          >
-            1. Landing Page
-          </button>
-          <button
-            onClick={() => navigateTo('login')}
-            className={`px-3 py-1 rounded-md transition font-medium whitespace-nowrap ${
-              currentView === 'login'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-300 hover:bg-slate-800'
-            }`}
-          >
-            2. Log In
-          </button>
-          <button
-            onClick={() => navigateTo('register')}
-            className={`px-3 py-1 rounded-md transition font-medium whitespace-nowrap ${
-              currentView === 'register'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-300 hover:bg-slate-800'
-            }`}
-          >
-            3. Create Account
-          </button>
-          <button
-            onClick={() => navigateTo('profile')}
-            className={`px-3 py-1 rounded-md transition font-medium whitespace-nowrap ${
-              currentView === 'profile'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-300 hover:bg-slate-800'
-            }`}
-          >
-            4. Complete Profile
-          </button>
-          <button
-            onClick={() => navigateTo('jobs')}
-            className={`px-3 py-1 rounded-md transition font-medium whitespace-nowrap ${
-              currentView === 'jobs'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-300 hover:bg-slate-800'
-            }`}
-          >
-            5. Job Search
-          </button>
-        </div>
-      </div>
-
-      {/* ───────────────────────────────────────────────────────────── */}
-      {/* RENDER ACTIVE VIEW PAGE                                       */}
+      {/* ACTIVE VIEW PAGE RENDER                                       */}
       {/* ───────────────────────────────────────────────────────────── */}
       <div className="flex-grow flex flex-col">
         {currentView === 'landing' && (
@@ -228,7 +164,7 @@ function LandingView({ navigateTo, wordIndex, words, mobileMenuOpen, setMobileMe
   return (
     <div className="fade-in flex flex-col min-h-screen">
       {/* Header Navigation */}
-      <header className="w-full bg-[#FAF9F5] border-b border-slate-200/60 sticky top-[37px] z-40">
+      <header className="w-full bg-[#FAF9F5] border-b border-slate-200/60 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-10">
             <button
@@ -747,7 +683,7 @@ function LoginView({ navigateTo, email, setEmail, password, setPassword, showPas
   return (
     <div className="fade-in flex flex-col min-h-screen bg-[#FAF9F5]">
       {/* Header Navigation */}
-      <header className="w-full bg-[#FAF9F5] border-b border-slate-200/60 sticky top-[37px] z-40">
+      <header className="w-full bg-[#FAF9F5] border-b border-slate-200/60 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <button
             onClick={() => navigateTo('landing')}
@@ -957,7 +893,7 @@ function RegisterView({
   return (
     <div className="fade-in flex flex-col min-h-screen bg-[#FAF9F5]">
       {/* Header Navigation */}
-      <header className="w-full bg-[#FAF9F5] border-b border-slate-200/60 sticky top-[37px] z-40">
+      <header className="w-full bg-[#FAF9F5] border-b border-slate-200/60 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <button
             onClick={() => navigateTo('landing')}
@@ -1204,7 +1140,7 @@ function ProfileView({
   return (
     <div className="fade-in flex flex-col min-h-screen bg-[#FAF9F5]">
       {/* Header Navigation */}
-      <header className="w-full bg-[#FAF9F5] border-b border-slate-200/60 sticky top-[37px] z-40">
+      <header className="w-full bg-[#FAF9F5] border-b border-slate-200/60 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-10">
             <button
@@ -1472,7 +1408,7 @@ function JobsView({
   return (
     <div className="fade-in flex flex-col min-h-screen bg-[#FAF9F5]">
       {/* Header Navigation */}
-      <header className="w-full bg-[#FAF9F5] border-b border-slate-200/60 sticky top-[37px] z-40">
+      <header className="w-full bg-[#FAF9F5] border-b border-slate-200/60 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-10">
             <button
