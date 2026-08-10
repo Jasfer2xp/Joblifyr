@@ -125,6 +125,12 @@ export default function App() {
             setShowPassword={setShowRegPassword}
           />
         )}
+        {currentView === 'verify' && (
+          <VerifyView
+            navigateTo={navigateTo}
+            email={regEmail || 'jane@example.com'}
+          />
+        )}
         {currentView === 'profile' && (
           <ProfileView
             navigateTo={navigateTo}
@@ -893,7 +899,7 @@ function RegisterView({
 }) {
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigateTo('profile');
+    navigateTo('verify');
   };
 
   return (
@@ -1738,3 +1744,96 @@ function JobsView({
     </div>
   );
 }
+
+/* =================================================================== */
+/* 6. EMAIL VERIFICATION 6-DIGIT CODE VIEW                              */
+/* =================================================================== */
+function VerifyView({ navigateTo, email }) {
+  const [code, setCode] = useState('');
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  const handleVerify = (e) => {
+    e.preventDefault();
+    if (code.length !== 6) {
+      setError('Please enter the full 6-digit verification code.');
+      return;
+    }
+    setError(null);
+    setSuccess(true);
+    setTimeout(() => {
+      navigateTo('login');
+    }, 1500);
+  };
+
+  return (
+    <div className="fade-in flex flex-col min-h-screen bg-[#FAF9F5]">
+      <header className="w-full bg-[#FAF9F5] border-b border-slate-200/60 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          <button onClick={() => navigateTo('landing')} className="text-2xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
+            <span className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center text-lg font-serif">J</span>
+            Joblifyr
+          </button>
+        </div>
+      </header>
+
+      <main className="flex-grow flex items-center justify-center py-12 px-4">
+        <div className="w-full max-w-md bg-white rounded-3xl p-8 sm:p-10 border border-slate-200/80 shadow-xl text-center">
+          <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-6">
+            ✉️
+          </div>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Check your email</h1>
+          <p className="text-sm text-slate-500 mt-2">
+            We sent a 6-digit security verification code to <br/>
+            <strong className="text-slate-900 font-bold">{email || 'your email address'}</strong>
+          </p>
+
+          {error && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-medium">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="mt-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-xl font-semibold">
+              ✓ Email verified successfully! Redirecting to Log In...
+            </div>
+          )}
+
+          <form onSubmit={handleVerify} className="mt-6 space-y-6">
+            <div>
+              <input
+                type="text"
+                maxLength={6}
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                placeholder="000000"
+                className="w-full bg-[#FAF9F5] border border-slate-300 rounded-xl py-3 text-center text-3xl font-extrabold tracking-[12px] text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                autoFocus
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-[#4F52E6] hover:bg-[#4345D9] text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-500/20 transition text-sm text-center"
+            >
+              Verify Account →
+            </button>
+          </form>
+
+          <div className="mt-6 text-xs text-slate-500">
+            Didn't receive the code?{' '}
+            <button onClick={() => navigateTo('register')} className="text-indigo-600 font-bold hover:underline">
+              Try registering again
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <footer className="bg-[#0B0F19] text-slate-400 py-6 px-6 text-xs text-center border-t border-slate-800">
+        © 2024 Joblifyr Inc. Built for ambitious teams.
+      </footer>
+    </div>
+  );
+}
+

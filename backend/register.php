@@ -4,6 +4,8 @@
     require_once __DIR__ . '/../classes/User.php';
     require_once __DIR__ . '/send_email.php';
 
+    session_start();
+
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         header("Location: ../auth/register.php");
         exit;
@@ -18,12 +20,22 @@
 
     try {
         $user = new User($pdo);
-        $user->register($data);
+        
+        // Generate 6-digit verification code & save to pending_verifications table
+        $code = $user->createPendingVerification($data);
 
-        // Send real welcome verification email via PHPMailer & Gmail App Password
-        sendWelcomeEmail($data['email'], $data['first_name']);
+        // Send 6-digit code to real email via PHPMailer & Gmail SMTP
+        $mailSent = sendVerificationCodeEmail($data['email'], $data['first_name'], $code);
 
-        header("Location: ../auth/login.php?status=success&registered=" . urlencode($data['email']));
+        if (!$mailSent) {
+            throw new Exception("Failed to send verification email. Please ensure your email address is valid.");
+        }
+
+        // Store pending email in session for verification screen
+        $_SESSION['pending_verify_email'] = $data['email'];
+
+        // Redirect to 6-digit code verification page
+        header("Location: ../auth/verify.php?email=" . urlencode($data['email']));
         exit;
 
     } catch (Exception $e) {
