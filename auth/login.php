@@ -39,6 +39,12 @@ $csrf_token = generate_csrf_token();
             <h1 class="login-title">Login</h1>
             <p class="login-subtitle">Welcome back! Please login to your account.</p>
 
+            <?php if (isset($_GET['status'])): ?>
+                <div style="background-color: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; text-align: center;">
+                    <?php echo htmlspecialchars($_GET['status']); ?>
+                </div>
+            <?php endif; ?>
+
             <div class="social-login">
                 <button class="social-btn google-btn" type="button">
                     <i class="fab fa-google"></i>

@@ -1,39 +1,53 @@
 <?php
-/**
- * Email Sender Utility for Joblifyr
- * Uses PHPMailer with Gmail SMTP & App Password
- */
+if (!defined('SECURE_ACCESS')) {
+    define('SECURE_ACCESS', true);
+}
 
+require_once __DIR__ . '/../config/env.php';
 require_once __DIR__ . '/../includes/phpmailer/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+/**
+ * Send email using PHPMailer and Gmail SMTP with App Password
+ */
 function sendJoblifyrEmail($toEmail, $toName, $subject, $htmlContent) {
     $mail = new PHPMailer(true);
 
     try {
-        // Server settings
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';
-        $mail->Host       = getenv('SMTP_HOST') ?: 'smtp.gmail.com';
-        $mail->Port       = (int)(getenv('SMTP_PORT') ?: 587);
+        
+        // Gmail SMTP Server Settings
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->Port       = 587;
         $mail->SMTPAuth   = true;
-        $mail->Username   = getenv('SMTP_USER') ?: 'joblifyr@gmail.com';
-        $mail->Password   = getenv('SMTP_PASS') ?: 'kciegydmtecxogjo';
+        $mail->Username   = 'joblifyr@gmail.com';
+        $mail->Password   = 'kciegydmtecxogjo'; // Google App Password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 
-        // Recipients
-        $mail->setFrom('joblifyr@gmail.com', 'Joblifyr Security');
+        // SSL stream options to ensure connection succeeds across all servers
+        $mail->smtpConnect([
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            ]
+        ]);
+
+        // Sender & Recipient
+        $mail->setFrom('joblifyr@gmail.com', 'Joblifyr Platform');
         $mail->addAddress($toEmail, $toName);
 
         // Content
         $mail->Subject = $subject;
         $mail->Body    = $htmlContent;
 
-        return $mail->send();
+        $sent = $mail->send();
+        return $sent;
     } catch (Exception $e) {
-        error_log("Joblifyr Mailer Error: {$mail->ErrorInfo}");
+        error_log("PHPMailer Send Error: " . $e->getMessage() . " | Info: " . $mail->ErrorInfo);
         return false;
     }
 }
@@ -43,8 +57,6 @@ function sendJoblifyrEmail($toEmail, $toName, $subject, $htmlContent) {
  */
 function sendVerificationCodeEmail($toEmail, $userName, $code) {
     $subject = "Your 6-Digit Joblifyr Verification Code: {$code}";
-    
-    // Format code as 123 456
     $formattedCode = substr($code, 0, 3) . ' ' . substr($code, 3, 3);
 
     $htmlBody = "

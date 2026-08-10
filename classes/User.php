@@ -166,6 +166,27 @@ class User {
         ];
     }
 
+    public function login(string $email, string $password): array {
+        $email = trim($email);
+        if (empty($email) || empty($password)) {
+            throw new Exception("Please enter both email address and password.");
+        }
+
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            throw new Exception("Account does not exist or has not been verified yet. Please register first.");
+        }
+
+        if (!password_verify($password, $user['password'])) {
+            throw new Exception("Incorrect password. Please try again.");
+        }
+
+        return $user;
+    }
+
     public function purgeExpired(): void {
         $this->db->exec("DELETE FROM pending_verifications WHERE expires_at < NOW()");
     }
