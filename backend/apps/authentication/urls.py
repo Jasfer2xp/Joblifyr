@@ -1,0 +1,21 @@
+from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView
+
+from .views import (
+    GoogleCallbackAPIView,
+    GoogleLoginAPIView,
+    LoginAPIView,
+    MeAPIView,
+    RegisterAPIView,
+    VerifyCodeAPIView,
+)
+
+urlpatterns = [
+    path('register/', RegisterAPIView.as_view(), name='api-register'),
+    path('verify-code/', VerifyCodeAPIView.as_view(), name='api-verify-code'),
+    path('login/', LoginAPIView.as_view(), name='api-login'),
+    path('me/', MeAPIView.as_view(), name='api-me'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
+    path('google/login/', GoogleLoginAPIView.as_view(), name='google-login'),
+    path('google/callback/', GoogleCallbackAPIView.as_view(), name='google-callback'),
+]
