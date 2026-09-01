@@ -14,12 +14,13 @@ Modern job marketplace monorepo.
 
 ```bash
 cd backend
-cp .env.example .env   # fill in secrets
+cp .env.example .env   # fill in secrets (especially DATABASE_URL)
 pip install -r requirements.txt
-python manage.py migrate
-python manage.py seed_jobs
+python scripts/setup_supabase_db.py   # migrate + seed on Supabase
 python manage.py runserver 8000
 ```
+
+Supabase project: `https://zbyipjlwtlbbuqllxgxy.supabase.co` — see `supabase/README.md` for database setup.
 
 ### Frontend
 

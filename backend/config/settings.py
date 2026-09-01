@@ -1,7 +1,7 @@
 import os
 from datetime import timedelta
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 from dotenv import load_dotenv
 
@@ -73,8 +73,8 @@ if DATABASE_URL:
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': parsed.path.lstrip('/') or 'postgres',
-            'USER': parsed.username,
-            'PASSWORD': parsed.password,
+            'USER': unquote(parsed.username) if parsed.username else '',
+            'PASSWORD': unquote(parsed.password) if parsed.password else '',
             'HOST': parsed.hostname,
             'PORT': parsed.port or 5432,
             'OPTIONS': {'sslmode': os.environ.get('DATABASE_SSLMODE', 'require')},

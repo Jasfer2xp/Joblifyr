@@ -1,0 +1,10 @@
+.env
+.env.local
+.env.*.local
+db.sqlite3
+__pycache__/
+*.pyc
+*.pyo
+.Python
+venv/
+.venv/
