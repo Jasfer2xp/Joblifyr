@@ -23,9 +23,16 @@ export default function AuthCallbackPage() {
       }
 
       try {
-        await refreshUser();
+        const currentUser = await refreshUser();
         const returnTo = result.returnTo || '/jobs';
+        const needsProfile = !currentUser?.country || !currentUser?.city || !currentUser?.phone || !currentUser?.date_of_birth;
         window.history.replaceState({}, '', '/auth/callback');
+
+        if (needsProfile) {
+          navigate('/complete-profile', { replace: true });
+          return;
+        }
+
         navigate(returnTo.startsWith('/') ? returnTo : '/jobs', { replace: true });
       } catch {
         setMessage('Signed in but failed to load profile.');

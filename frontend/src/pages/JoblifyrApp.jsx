@@ -56,6 +56,12 @@ export default function JoblifyrApp() {
   const location = useLocation();
   const { user } = useAuth();
 
+  useEffect(() => {
+    if (user && (location.pathname === '/' || location.pathname === '/login')) {
+      navigate('/jobs', { replace: true });
+    }
+  }, [user, location.pathname, navigate]);
+
   const [currentView, setCurrentView] = useState(PATH_TO_VIEW[location.pathname] || 'landing');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [pendingVerifyEmail, setPendingVerifyEmail] = useState(
@@ -133,6 +139,7 @@ export default function JoblifyrApp() {
             words={words}
             mobileMenuOpen={mobileMenuOpen}
             setMobileMenuOpen={setMobileMenuOpen}
+            user={user}
           />
         )}
         {currentView === 'login' && (
@@ -186,6 +193,9 @@ export default function JoblifyrApp() {
             savedToast={profileSavedToast}
           />
         )}
+        {currentView === 'complete-profile' && (
+          <CompleteProfileView navigateTo={navigateTo} user={user} />
+        )}
         {currentView === 'jobs' && (
           <JobsView
             navigateTo={navigateTo}
@@ -205,7 +215,9 @@ export default function JoblifyrApp() {
 /* =================================================================== */
 /* 1. LANDING PAGE VIEW (Matching Image 1)                            */
 /* =================================================================== */
-function LandingView({ navigateTo, wordIndex, words, mobileMenuOpen, setMobileMenuOpen }) {
+function LandingView({ navigateTo, wordIndex, words, mobileMenuOpen, setMobileMenuOpen, user }) {
+  const displayName = user?.first_name || user?.email?.split('@')[0] || 'there';
+
   return (
     <div className="fade-in flex flex-col min-h-screen">
       {/* Header Navigation */}
@@ -238,18 +250,37 @@ function LandingView({ navigateTo, wordIndex, words, mobileMenuOpen, setMobileMe
           </div>
 
           <div className="hidden md:flex items-center gap-4">
-            <button
-              onClick={() => navigateTo('login')}
-              className="text-sm font-semibold text-slate-700 hover:text-slate-900 px-4 py-2 rounded-xl transition"
-            >
-              Log In
-            </button>
-            <button
-              onClick={() => navigateTo('register')}
-              className="bg-[#4F52E6] hover:bg-[#4345D9] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition shadow-md shadow-indigo-500/20 flex items-center gap-2"
-            >
-              Join Joblifyr
-            </button>
+            {user ? (
+              <>
+                <button
+                  onClick={() => navigateTo('jobs')}
+                  className="text-sm font-semibold text-slate-700 hover:text-slate-900 px-4 py-2 rounded-xl transition"
+                >
+                  Hi, {displayName}
+                </button>
+                <button
+                  onClick={() => navigateTo('jobs')}
+                  className="bg-[#4F52E6] hover:bg-[#4345D9] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition shadow-md shadow-indigo-500/20 flex items-center gap-2"
+                >
+                  Dashboard
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => navigateTo('login')}
+                  className="text-sm font-semibold text-slate-700 hover:text-slate-900 px-4 py-2 rounded-xl transition"
+                >
+                  Log In
+                </button>
+                <button
+                  onClick={() => navigateTo('register')}
+                  className="bg-[#4F52E6] hover:bg-[#4345D9] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition shadow-md shadow-indigo-500/20 flex items-center gap-2"
+                >
+                  Join Joblifyr
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -1218,6 +1249,143 @@ function RegisterView({
 /* =================================================================== */
 /* 4. COMPLETE YOUR PROFILE VIEW (Matching Image 4)                    */
 /* =================================================================== */
+function CompleteProfileView({ navigateTo, user }) {
+  const { setSession } = useAuth();
+  const [form, setForm] = useState({
+    first_name: user?.first_name || '',
+    last_name: user?.last_name || '',
+    phone: user?.phone || '',
+    country: user?.country || '',
+    city: user?.city || '',
+    date_of_birth: user?.date_of_birth || '',
+    role: user?.role || 'job_seeker',
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const countryOptions = [
+    'United States', 'Canada', 'United Kingdom', 'Australia', 'Germany', 'France', 'Singapore', 'India', 'Philippines', 'United Arab Emirates', 'Japan', 'South Korea', 'Brazil', 'South Africa', 'Nigeria', 'Kenya', 'Mexico', 'Spain', 'Italy', 'Netherlands',
+  ];
+
+  const cityOptions = [
+    'New York', 'Los Angeles', 'Chicago', 'Toronto', 'Vancouver', 'London', 'Manchester', 'Sydney', 'Melbourne', 'Berlin', 'Munich', 'Paris', 'Singapore', 'Manila', 'Cebu', 'Dubai', 'Tokyo', 'Seoul', 'Delhi', 'Mumbai', 'São Paulo', 'Johannesburg', 'Lagos', 'Mexico City', 'Madrid', 'Rome', 'Amsterdam',
+  ];
+
+  const handleChange = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const payload = {
+        first_name: form.first_name.trim(),
+        last_name: form.last_name.trim(),
+        phone: form.phone.trim(),
+        country: form.country.trim(),
+        city: form.city.trim(),
+        date_of_birth: form.date_of_birth,
+        role: form.role,
+      };
+
+      const data = await completeProfile(payload);
+      const access = localStorage.getItem('joblifyr_access_token');
+      const refresh = localStorage.getItem('joblifyr_refresh_token');
+      if (data.user) {
+        setSession(data.user, { access, refresh });
+      }
+      navigateTo('jobs');
+    } catch (err) {
+      setError(err.message || 'Could not complete your profile.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fade-in flex flex-col min-h-screen bg-[#FAF9F5]">
+      <header className="w-full bg-[#FAF9F5] border-b border-slate-200/60 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          <button onClick={() => navigateTo('landing')} className="text-2xl font-extrabold tracking-tight text-slate-900">Joblifyr</button>
+          <button onClick={() => navigateTo('jobs')} className="text-sm font-semibold text-slate-700 hover:text-slate-900">Skip for now</button>
+        </div>
+      </header>
+
+      <main className="flex-grow max-w-3xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Complete your profile</h1>
+          <p className="text-slate-500 text-sm mt-2 max-w-xl mx-auto">Tell us a little about yourself so we can personalize your experience.</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-sm space-y-6">
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-medium">{error}</div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">First Name</label>
+              <input required value={form.first_name} onChange={(e) => handleChange('first_name', e.target.value)} className="w-full bg-[#FAF9F5] border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Last Name</label>
+              <input required value={form.last_name} onChange={(e) => handleChange('last_name', e.target.value)} className="w-full bg-[#FAF9F5] border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Phone</label>
+              <input required value={form.phone} onChange={(e) => handleChange('phone', e.target.value)} className="w-full bg-[#FAF9F5] border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Date of Birth</label>
+              <input type="date" required value={form.date_of_birth} onChange={(e) => handleChange('date_of_birth', e.target.value)} className="w-full bg-[#FAF9F5] border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Country</label>
+              <input list="country-list" required value={form.country} onChange={(e) => handleChange('country', e.target.value)} className="w-full bg-[#FAF9F5] border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+              <datalist id="country-list">
+                {countryOptions.map((country) => <option key={country} value={country} />)}
+              </datalist>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">City</label>
+              <input list="city-list" required value={form.city} onChange={(e) => handleChange('city', e.target.value)} className="w-full bg-[#FAF9F5] border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+              <datalist id="city-list">
+                {cityOptions.map((city) => <option key={city} value={city} />)}
+              </datalist>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">I am a</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button type="button" onClick={() => handleChange('role', 'job_seeker')} className={`py-3 px-4 rounded-xl border font-semibold text-xs transition ${form.role === 'job_seeker' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+                Job Seeker
+              </button>
+              <button type="button" onClick={() => handleChange('role', 'employer')} className={`py-3 px-4 rounded-xl border font-semibold text-xs transition ${form.role === 'employer' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+                Employer
+              </button>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-4 pt-2">
+            <button type="button" onClick={() => navigateTo('jobs')} className="bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-semibold px-5 py-3 rounded-xl text-sm transition">Skip</button>
+            <button type="submit" disabled={loading} className="bg-[#4F52E6] hover:bg-[#4345D9] disabled:opacity-60 text-white font-semibold px-6 py-3 rounded-xl text-sm shadow-md shadow-indigo-500/20 transition">{loading ? 'Saving…' : 'Continue'}</button>
+          </div>
+        </form>
+      </main>
+    </div>
+  );
+}
+
 function ProfileView({
   navigateTo,
   name,

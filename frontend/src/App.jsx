@@ -13,6 +13,7 @@ export default function App() {
         <Route path="/register" element={<JoblifyrApp />} />
         <Route path="/verify" element={<JoblifyrApp />} />
         <Route path="/profile" element={<JoblifyrApp />} />
+        <Route path="/complete-profile" element={<JoblifyrApp />} />
         <Route path="/jobs" element={<JoblifyrApp />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

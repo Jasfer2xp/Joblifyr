@@ -38,6 +38,10 @@ def _user_payload(user):
         'auth_provider': user.auth_provider,
         'avatar_url': user.avatar_url,
         'is_verified': user.is_verified,
+        'phone': user.phone,
+        'country': user.country,
+        'city': user.city,
+        'date_of_birth': user.date_of_birth.isoformat() if user.date_of_birth else None,
     }
 
 
@@ -216,6 +220,45 @@ class MeAPIView(APIView):
 
     def get(self, request):
         return Response({'user': _user_payload(request.user)})
+
+
+class CompleteProfileAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        first_name = (request.data.get('first_name') or '').strip()
+        last_name = (request.data.get('last_name') or '').strip()
+        phone = (request.data.get('phone') or '').strip()
+        country = (request.data.get('country') or '').strip()
+        city = (request.data.get('city') or '').strip()
+        date_of_birth = request.data.get('date_of_birth')
+        role = request.data.get('role') or user.role or JoblifyrUser.Role.JOB_SEEKER
+
+        if not first_name or not last_name:
+            return Response({'error': 'First name and last name are required.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not phone or not country or not city:
+            return Response({'error': 'Phone, country, and city are required.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not date_of_birth:
+            return Response({'error': 'Date of birth is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        if role not in JoblifyrUser.Role.values:
+            role = JoblifyrUser.Role.JOB_SEEKER
+
+        try:
+            user.first_name = first_name
+            user.last_name = last_name
+            user.phone = phone
+            user.country = country
+            user.city = city
+            user.date_of_birth = date_of_birth
+            user.role = role
+            user.is_verified = True
+            user.save(update_fields=['first_name', 'last_name', 'phone', 'country', 'city', 'date_of_birth', 'role', 'is_verified'])
+        except Exception as exc:
+            logger.exception('Profile completion failed: %s', exc)
+            return Response({'error': 'Could not update profile.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({'success': True, 'user': _user_payload(user)}, status=status.HTTP_200_OK)
 
 
 class GoogleLoginAPIView(APIView):

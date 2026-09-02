@@ -73,6 +73,19 @@ export async function fetchCurrentUser() {
   return data.user;
 }
 
+export async function completeProfile(profileData) {
+  const data = await apiRequest('/api/v1/auth/complete-profile/', {
+    method: 'POST',
+    body: JSON.stringify(profileData),
+  });
+
+  if (data.user) {
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+  }
+
+  return data;
+}
+
 export async function logoutUser() {
   clearSession();
 }
