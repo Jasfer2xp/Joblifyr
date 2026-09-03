@@ -31,7 +31,7 @@ import {
   Quote
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { startGoogleLogin } from '../services/auth';
+import { completeProfile, startGoogleLogin } from '../services/auth';
 
 const PATH_TO_VIEW = {
   '/': 'landing',
@@ -39,6 +39,7 @@ const PATH_TO_VIEW = {
   '/register': 'register',
   '/verify': 'verify',
   '/profile': 'profile',
+  '/complete-profile': 'complete-profile',
   '/jobs': 'jobs',
 };
 
