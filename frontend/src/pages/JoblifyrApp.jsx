@@ -986,6 +986,8 @@ function RegisterView({
   const { register } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [cities, setCities] = useState([]);
+  const [citiesLoading, setCitiesLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -1268,13 +1270,41 @@ function CompleteProfileView({ navigateTo, user }) {
     'United States', 'Canada', 'United Kingdom', 'Australia', 'Germany', 'France', 'Singapore', 'India', 'Philippines', 'United Arab Emirates', 'Japan', 'South Korea', 'Brazil', 'South Africa', 'Nigeria', 'Kenya', 'Mexico', 'Spain', 'Italy', 'Netherlands',
   ];
 
-  const cityOptions = [
-    'New York', 'Los Angeles', 'Chicago', 'Toronto', 'Vancouver', 'London', 'Manchester', 'Sydney', 'Melbourne', 'Berlin', 'Munich', 'Paris', 'Singapore', 'Manila', 'Cebu', 'Dubai', 'Tokyo', 'Seoul', 'Delhi', 'Mumbai', 'São Paulo', 'Johannesburg', 'Lagos', 'Mexico City', 'Madrid', 'Rome', 'Amsterdam',
-  ];
-
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
+
+  useEffect(() => {
+    if (!form.country) {
+      setCities([]);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    setCitiesLoading(true);
+    setCities([]);
+    handleChange('city', '');
+
+    fetch('https://countriesnow.space/api/v0.1/countries/cities', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ country: form.country }),
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error('Could not load cities.');
+        return response.json();
+      })
+      .then((result) => {
+        setCities(Array.isArray(result.data) ? result.data : []);
+      })
+      .catch((requestError) => {
+        if (requestError.name !== 'AbortError') setError('Could not load cities for this country.');
+      })
+      .finally(() => setCitiesLoading(false));
+
+    return () => controller.abort();
+  }, [form.country]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -1311,7 +1341,6 @@ function CompleteProfileView({ navigateTo, user }) {
       <header className="w-full bg-[#FAF9F5] border-b border-slate-200/60 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <button onClick={() => navigateTo('landing')} className="text-2xl font-extrabold tracking-tight text-slate-900">Joblifyr</button>
-          <button onClick={() => navigateTo('jobs')} className="text-sm font-semibold text-slate-700 hover:text-slate-900">Skip for now</button>
         </div>
       </header>
 
@@ -1351,17 +1380,17 @@ function CompleteProfileView({ navigateTo, user }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Country</label>
-              <input list="country-list" required value={form.country} onChange={(e) => handleChange('country', e.target.value)} className="w-full bg-[#FAF9F5] border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
-              <datalist id="country-list">
-                {countryOptions.map((country) => <option key={country} value={country} />)}
-              </datalist>
+              <select required value={form.country} onChange={(e) => handleChange('country', e.target.value)} className="w-full bg-[#FAF9F5] border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                <option value="">Select a country</option>
+                {countryOptions.map((country) => <option key={country} value={country}>{country}</option>)}
+              </select>
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">City</label>
-              <input list="city-list" required value={form.city} onChange={(e) => handleChange('city', e.target.value)} className="w-full bg-[#FAF9F5] border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
-              <datalist id="city-list">
-                {cityOptions.map((city) => <option key={city} value={city} />)}
-              </datalist>
+              <select required disabled={!form.country || citiesLoading} value={form.city} onChange={(e) => handleChange('city', e.target.value)} className="w-full bg-[#FAF9F5] border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 disabled:opacity-60">
+                <option value="">{citiesLoading ? 'Loading cities...' : 'Select a city'}</option>
+                {cities.map((city) => <option key={city} value={city}>{city}</option>)}
+              </select>
             </div>
           </div>
 
@@ -1378,7 +1407,6 @@ function CompleteProfileView({ navigateTo, user }) {
           </div>
 
           <div className="flex justify-end gap-4 pt-2">
-            <button type="button" onClick={() => navigateTo('jobs')} className="bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-semibold px-5 py-3 rounded-xl text-sm transition">Skip</button>
             <button type="submit" disabled={loading} className="bg-[#4F52E6] hover:bg-[#4345D9] disabled:opacity-60 text-white font-semibold px-6 py-3 rounded-xl text-sm shadow-md shadow-indigo-500/20 transition">{loading ? 'Saving…' : 'Continue'}</button>
           </div>
         </form>
