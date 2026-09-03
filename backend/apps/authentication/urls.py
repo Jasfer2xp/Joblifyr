@@ -3,6 +3,8 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
     CompleteProfileAPIView,
+    CountriesAPIView,
+    CitiesAPIView,
     GoogleCallbackAPIView,
     GoogleLoginAPIView,
     LoginAPIView,
@@ -12,6 +14,8 @@ from .views import (
 )
 
 urlpatterns = [
+    path('countries/', CountriesAPIView.as_view(), name='countries'),
+    path('cities/', CitiesAPIView.as_view(), name='cities'),
     path('register/', RegisterAPIView.as_view(), name='api-register'),
     path('verify-code/', VerifyCodeAPIView.as_view(), name='api-verify-code'),
     path('login/', LoginAPIView.as_view(), name='api-login'),

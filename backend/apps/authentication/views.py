@@ -222,6 +222,43 @@ class MeAPIView(APIView):
         return Response({'user': _user_payload(request.user)})
 
 
+class CountriesAPIView(APIView):
+    def get(self, request):
+        try:
+            response = requests.get('https://countriesnow.space/api/v0.1/countries', timeout=15)
+            response.raise_for_status()
+            result = response.json()
+            countries = sorted(
+                item['country']
+                for item in result.get('data', [])
+                if item.get('country')
+            )
+            return Response({'countries': countries})
+        except (requests.RequestException, ValueError, TypeError) as exc:
+            logger.error('Country directory request failed: %s', exc)
+            return Response({'error': 'Could not load countries.'}, status=status.HTTP_502_BAD_GATEWAY)
+
+
+class CitiesAPIView(APIView):
+    def get(self, request):
+        country = (request.query_params.get('country') or '').strip()
+        if not country:
+            return Response({'error': 'Country is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            response = requests.post(
+                'https://countriesnow.space/api/v0.1/countries/cities',
+                json={'country': country},
+                timeout=20,
+            )
+            response.raise_for_status()
+            result = response.json()
+            return Response({'cities': result.get('data') or []})
+        except (requests.RequestException, ValueError, TypeError) as exc:
+            logger.error('City directory request failed for %s: %s', country, exc)
+            return Response({'error': 'Could not load cities.'}, status=status.HTTP_502_BAD_GATEWAY)
+
+
 class CompleteProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
 

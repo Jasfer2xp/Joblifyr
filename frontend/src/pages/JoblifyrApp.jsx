@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { completeProfile, startGoogleLogin } from '../services/auth';
+import { fetchCities, fetchCountries } from '../services/locations';
 
 const PATH_TO_VIEW = {
   '/': 'landing',
@@ -1277,16 +1278,9 @@ function CompleteProfileView({ navigateTo, user }) {
   useEffect(() => {
     const controller = new AbortController();
 
-    fetch('https://countriesnow.space/api/v0.1/countries', { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) throw new Error('Could not load countries.');
-        return response.json();
-      })
+    fetchCountries(controller.signal)
       .then((result) => {
-        const countryNames = Array.isArray(result.data)
-          ? result.data.map((item) => item.country).filter(Boolean).sort()
-          : [];
-        setCountries(countryNames);
+        setCountries(Array.isArray(result.countries) ? result.countries : []);
       })
       .catch((requestError) => {
         if (requestError.name !== 'AbortError') setError('Could not load the country list.');
@@ -1307,18 +1301,9 @@ function CompleteProfileView({ navigateTo, user }) {
     setCities([]);
     handleChange('city', '');
 
-    fetch('https://countriesnow.space/api/v0.1/countries/cities', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ country: form.country }),
-      signal: controller.signal,
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error('Could not load cities.');
-        return response.json();
-      })
+    fetchCities(form.country, controller.signal)
       .then((result) => {
-        setCities(Array.isArray(result.data) ? result.data : []);
+        setCities(Array.isArray(result.cities) ? result.cities : []);
       })
       .catch((requestError) => {
         if (requestError.name !== 'AbortError') setError('Could not load cities for this country.');
