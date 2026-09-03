@@ -1265,16 +1265,36 @@ function CompleteProfileView({ navigateTo, user }) {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [countries, setCountries] = useState([]);
+  const [countriesLoading, setCountriesLoading] = useState(true);
   const [cities, setCities] = useState([]);
   const [citiesLoading, setCitiesLoading] = useState(false);
-
-  const countryOptions = [
-    'United States', 'Canada', 'United Kingdom', 'Australia', 'Germany', 'France', 'Singapore', 'India', 'Philippines', 'United Arab Emirates', 'Japan', 'South Korea', 'Brazil', 'South Africa', 'Nigeria', 'Kenya', 'Mexico', 'Spain', 'Italy', 'Netherlands',
-  ];
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch('https://countriesnow.space/api/v0.1/countries', { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error('Could not load countries.');
+        return response.json();
+      })
+      .then((result) => {
+        const countryNames = Array.isArray(result.data)
+          ? result.data.map((item) => item.country).filter(Boolean).sort()
+          : [];
+        setCountries(countryNames);
+      })
+      .catch((requestError) => {
+        if (requestError.name !== 'AbortError') setError('Could not load the country list.');
+      })
+      .finally(() => setCountriesLoading(false));
+
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     if (!form.country) {
@@ -1382,9 +1402,9 @@ function CompleteProfileView({ navigateTo, user }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Country</label>
-              <select required value={form.country} onChange={(e) => handleChange('country', e.target.value)} className="w-full bg-[#FAF9F5] border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
-                <option value="">Select a country</option>
-                {countryOptions.map((country) => <option key={country} value={country}>{country}</option>)}
+              <select required disabled={countriesLoading} value={form.country} onChange={(e) => handleChange('country', e.target.value)} className="w-full bg-[#FAF9F5] border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 disabled:opacity-60">
+                <option value="">{countriesLoading ? 'Loading countries...' : 'Select a country'}</option>
+                {countries.map((country) => <option key={country} value={country}>{country}</option>)}
               </select>
             </div>
             <div>
