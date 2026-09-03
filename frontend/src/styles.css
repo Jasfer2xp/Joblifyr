@@ -78,3 +78,30 @@ body {
   background: #eef2ff;
   color: #4338ca;
 }
+
+.profile-nav-item,
+.profile-nav-active {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.7rem;
+  border-radius: 0.75rem;
+  padding: 0.7rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.profile-nav-item {
+  color: #64748b;
+}
+
+.profile-nav-item:hover {
+  background: #f8fafc;
+  color: #334155;
+}
+
+.profile-nav-active {
+  background: #eef2ff;
+  color: #4338ca;
+}

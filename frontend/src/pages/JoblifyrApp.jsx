@@ -1525,7 +1525,7 @@ function ProfileView({
               <button onClick={() => navigateTo('jobs')} className="hover:text-slate-900">
                 Salaries
               </button>
-              <button onClick={() => navigateTo('jobs')} className="hover:text-slate-900">
+              <button onClick={() => navigateTo('messages')} className="hover:text-slate-900">
                 Messages
               </button>
             </nav>
@@ -1544,7 +1544,20 @@ function ProfileView({
       </header>
 
       {/* Main Body */}
-      <main className="flex-grow max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
+      <main className="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8">
+        <aside className="h-fit bg-white border border-slate-200 rounded-2xl p-3 shadow-sm">
+          <p className="px-3 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Profile workspace</p>
+          <button className="profile-nav-active"><User size={16} /> Overview</button>
+          <button className="profile-nav-item"><BriefcaseBusiness size={16} /> Work history</button>
+          <button className="profile-nav-item"><Layers size={16} /> Portfolio</button>
+          <button className="profile-nav-item"><StarIcon size={16} /> Reviews</button>
+          <button className="profile-nav-item"><Settings size={16} /> Preferences</button>
+          <div className="border-t border-slate-100 mt-3 pt-3">
+            <button onClick={() => navigateTo('services')} className="profile-nav-item"><BriefcaseBusiness size={16} /> Services</button>
+            <button onClick={() => navigateTo('messages')} className="profile-nav-item"><MessageSquare size={16} /> Messages</button>
+          </div>
+        </aside>
+        <div>
         <div className="text-center mb-10">
           <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">
             {user?.first_name || 'Your'} profile
@@ -1651,6 +1664,7 @@ function ProfileView({
             Continue to Experience
           </button>
         </div>
+        </div>
       </main>
 
       {/* Light Clean Footer */}
@@ -1675,6 +1689,9 @@ function ProfileView({
 }
 
 function AccountPanelView({ navigateTo, view, user }) {
+  if (view === 'messages') return <MessagesView navigateTo={navigateTo} user={user} />;
+  if (view === 'settings') return <SettingsView navigateTo={navigateTo} user={user} />;
+
   const content = {
     services: {
       title: 'Your services',
@@ -1735,6 +1752,84 @@ function AccountPanelView({ navigateTo, view, user }) {
             <p className="text-sm text-slate-300 mt-3">Add more detail to help the right people discover you.</p>
             <button onClick={() => navigateTo('profile')} className="mt-7 bg-white text-slate-900 font-bold text-sm px-4 py-3 rounded-xl hover:bg-indigo-50">Open profile</button>
           </aside>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function AccountHeader({ navigateTo, user }) {
+  return (
+    <header className="border-b border-slate-200/60 bg-[#FAF9F5] sticky top-0 z-40">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <button onClick={() => navigateTo('jobs')} className="text-2xl font-extrabold tracking-tight text-slate-900">Joblifyr</button>
+        <AccountMenu navigateTo={navigateTo} user={user} />
+      </div>
+    </header>
+  );
+}
+
+function SettingsView({ navigateTo, user }) {
+  return (
+    <div className="fade-in min-h-screen bg-[#FAF9F5]">
+      <AccountHeader navigateTo={navigateTo} user={user} />
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8">
+        <aside className="h-fit bg-white border border-slate-200 rounded-2xl p-3 shadow-sm">
+          <p className="px-3 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Settings</p>
+          <button className="profile-nav-active"><User size={16} /> Account</button>
+          <button className="profile-nav-item"><Lock size={16} /> Security</button>
+          <button className="profile-nav-item"><Mail size={16} /> Notifications</button>
+          <button className="profile-nav-item"><Eye size={16} /> Privacy</button>
+          <button className="profile-nav-item"><Globe size={16} /> Language</button>
+        </aside>
+        <section>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-600">Account center</p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 mt-2">Settings</h1>
+          <p className="text-slate-500 mt-2 mb-8">Control how your Joblifyr account works and appears to others.</p>
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm divide-y divide-slate-100">
+            <SettingRow label="Account type" value={user?.role === 'employer' ? 'Employer' : 'Job seeker'} action="Change" />
+            <SettingRow label="Email address" value={user?.email || 'Not available'} action="Manage" />
+            <SettingRow label="Phone number" value={user?.phone || 'Add a phone number'} action="Edit" />
+            <SettingRow label="Profile visibility" value="Visible to relevant opportunities" action="Edit" />
+            <SettingRow label="Email notifications" value="Recommended updates enabled" action="Manage" />
+          </div>
+          <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-5 flex items-center justify-between gap-4">
+            <div><h2 className="font-bold text-red-900">Sign out everywhere</h2><p className="text-xs text-red-700 mt-1">End active sessions on your connected devices.</p></div>
+            <button onClick={() => navigateTo('landing')} className="shrink-0 text-sm font-bold text-red-700 border border-red-300 rounded-xl px-4 py-2 hover:bg-white">Sign out</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+function SettingRow({ label, value, action }) {
+  return <div className="p-6 flex items-center justify-between gap-4"><div><h2 className="text-sm font-bold text-slate-900">{label}</h2><p className="text-xs text-slate-500 mt-1">{value}</p></div><button className="text-xs font-bold text-indigo-600 hover:text-indigo-800">{action}</button></div>;
+}
+
+function MessagesView({ navigateTo, user }) {
+  const [selected, setSelected] = useState(0);
+  const conversations = [
+    { name: 'Joblifyr updates', preview: 'Your profile is ready to discover.', time: 'Today', body: 'Welcome to Joblifyr. Complete your profile and explore opportunities that fit your goals.' },
+    { name: 'Stellar Tech Innovations', preview: 'Thanks for your interest in the role.', time: 'Mon', body: 'Thanks for your interest in the Senior UX Designer role. We will be in touch soon.' },
+    { name: 'Talent support', preview: 'How can we help?', time: 'Sun', body: 'Our support team is here when you need help with your account or applications.' },
+  ];
+
+  return (
+    <div className="fade-in min-h-screen bg-[#FAF9F5]">
+      <AccountHeader navigateTo={navigateTo} user={user} />
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="mb-7"><p className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-600">Inbox</p><h1 className="text-4xl font-extrabold tracking-tight text-slate-900 mt-2">Messages</h1><p className="text-slate-500 mt-2">Stay connected with employers, clients, and the Joblifyr team.</p></div>
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden grid grid-cols-1 md:grid-cols-[310px_1fr] min-h-[520px]">
+          <section className="border-r border-slate-200">
+            <div className="p-4 border-b border-slate-100"><div className="relative"><Search size={16} className="absolute left-3 top-3 text-slate-400" /><input placeholder="Search conversations" className="w-full rounded-xl bg-slate-50 border border-slate-200 pl-9 pr-3 py-2.5 text-xs focus:outline-none focus:border-indigo-500" /></div></div>
+            {conversations.map((conversation, index) => <button key={conversation.name} onClick={() => setSelected(index)} className={`w-full text-left p-4 border-b border-slate-100 ${selected === index ? 'bg-indigo-50/70 border-l-2 border-l-indigo-600' : 'hover:bg-slate-50'}`}><div className="flex justify-between gap-2"><span className="text-sm font-bold text-slate-900">{conversation.name}</span><span className="text-[10px] text-slate-400">{conversation.time}</span></div><p className="text-xs text-slate-500 mt-1 truncate">{conversation.preview}</p></button>)}
+          </section>
+          <section className="flex flex-col">
+            <div className="p-5 border-b border-slate-200 flex items-center justify-between"><div><h2 className="font-bold text-slate-900">{conversations[selected].name}</h2><p className="text-xs text-emerald-600 mt-1">Active conversation</p></div><button className="p-2 rounded-lg text-slate-500 hover:bg-slate-100" aria-label="Conversation settings"><Settings size={17} /></button></div>
+            <div className="flex-1 p-6 bg-slate-50/60"><div className="max-w-lg rounded-2xl rounded-tl-sm bg-white border border-slate-200 p-4 shadow-sm"><p className="text-xs text-slate-700 leading-relaxed">{conversations[selected].body}</p><span className="block text-[10px] text-slate-400 mt-3">10:24 AM</span></div></div>
+            <div className="p-4 border-t border-slate-200 flex gap-2"><input placeholder="Write a message..." className="flex-1 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 text-xs focus:outline-none focus:border-indigo-500" /><button className="bg-indigo-600 text-white font-bold text-xs px-5 rounded-xl hover:bg-indigo-700">Send</button></div>
+          </section>
         </div>
       </main>
     </div>
