@@ -28,7 +28,13 @@ import {
   Bookmark,
   Layers,
   ArrowUpRight,
-  Quote
+  Quote,
+  ChevronDown,
+  LogOut,
+  MessageSquare,
+  Settings,
+  Star as StarIcon,
+  BriefcaseBusiness
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { completeProfile, startGoogleLogin } from '../services/auth';
@@ -42,6 +48,10 @@ const PATH_TO_VIEW = {
   '/profile': 'profile',
   '/complete-profile': 'complete-profile',
   '/jobs': 'jobs',
+  '/services': 'services',
+  '/messages': 'messages',
+  '/reviews': 'reviews',
+  '/settings': 'settings',
 };
 
 const VIEW_TO_PATH = {
@@ -51,6 +61,10 @@ const VIEW_TO_PATH = {
   verify: '/verify',
   profile: '/profile',
   jobs: '/jobs',
+  services: '/services',
+  messages: '/messages',
+  reviews: '/reviews',
+  settings: '/settings',
 };
 
 export default function JoblifyrApp() {
@@ -181,6 +195,7 @@ export default function JoblifyrApp() {
         {currentView === 'profile' && (
           <ProfileView
             navigateTo={navigateTo}
+            user={user}
             name={profileName}
             setName={setProfileName}
             heading={profileHeading}
@@ -201,6 +216,7 @@ export default function JoblifyrApp() {
         {currentView === 'jobs' && (
           <JobsView
             navigateTo={navigateTo}
+            user={user}
             selectedJobId={selectedJobId}
             setSelectedJobId={setSelectedJobId}
             searchTitle={searchTitle}
@@ -208,6 +224,9 @@ export default function JoblifyrApp() {
             searchLocation={searchLocation}
             setSearchLocation={setSearchLocation}
           />
+        )}
+        {['services', 'messages', 'reviews', 'settings'].includes(currentView) && (
+          <AccountPanelView navigateTo={navigateTo} view={currentView} user={user} />
         )}
       </div>
     </div>
@@ -1422,8 +1441,55 @@ function CompleteProfileView({ navigateTo, user }) {
   );
 }
 
+function AccountMenu({ navigateTo, user }) {
+  const { logout } = useAuth();
+  const [open, setOpen] = useState(false);
+  const displayName = [user?.first_name, user?.last_name].filter(Boolean).join(' ') || user?.email || 'Your account';
+
+  const handleLogout = async () => {
+    await logout();
+    navigateTo('landing');
+  };
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        aria-label="Open account menu"
+        className="flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1 pr-2 shadow-sm hover:border-indigo-300"
+      >
+        {user?.avatar_url ? (
+          <img src={user.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+        ) : (
+          <span className="h-8 w-8 rounded-full bg-indigo-600 text-white flex items-center justify-center">
+            <User size={16} />
+          </span>
+        )}
+        <ChevronDown size={15} className="text-slate-500" />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-12 z-50 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+          <div className="border-b border-slate-100 px-3 py-3">
+            <p className="text-sm font-bold text-slate-900 truncate">{displayName}</p>
+            <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+          </div>
+          <button onClick={() => { setOpen(false); navigateTo('profile'); }} className="account-menu-item"><User size={16} /> Profile</button>
+          <button onClick={() => { setOpen(false); navigateTo('services'); }} className="account-menu-item"><BriefcaseBusiness size={16} /> Services</button>
+          <button onClick={() => { setOpen(false); navigateTo('messages'); }} className="account-menu-item"><MessageSquare size={16} /> Messages</button>
+          <button onClick={() => { setOpen(false); navigateTo('reviews'); }} className="account-menu-item"><StarIcon size={16} /> Reviews</button>
+          <button onClick={() => { setOpen(false); navigateTo('settings'); }} className="account-menu-item"><Settings size={16} /> Settings</button>
+          <button onClick={handleLogout} className="account-menu-item border-t border-slate-100 mt-1 pt-3 text-red-600"><LogOut size={16} /> Log out</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ProfileView({
   navigateTo,
+  user,
   name,
   setName,
   heading,
@@ -1472,15 +1538,7 @@ function ProfileView({
             >
               Upload your resume
             </button>
-            <div className="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-xs">
-              JD
-            </div>
-            <button
-              onClick={() => navigateTo('jobs')}
-              className="text-slate-700 hover:text-slate-900 border-l border-slate-300 pl-4"
-            >
-              Employers / Post Job
-            </button>
+            <AccountMenu navigateTo={navigateTo} user={user} />
           </div>
         </div>
       </header>
@@ -1489,11 +1547,10 @@ function ProfileView({
       <main className="flex-grow max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">
-            Complete Your Profile
+            {user?.first_name || 'Your'} profile
           </h1>
           <p className="text-slate-500 text-sm mt-2 max-w-xl mx-auto">
-            Stand out to top employers by providing a comprehensive overview of your skills and
-            experience.
+            Build a clear, credible profile that helps the right opportunities find you.
           </p>
         </div>
 
@@ -1617,11 +1674,79 @@ function ProfileView({
   );
 }
 
+function AccountPanelView({ navigateTo, view, user }) {
+  const content = {
+    services: {
+      title: 'Your services',
+      subtitle: 'Present the work you do and the outcomes you deliver.',
+      icon: <BriefcaseBusiness size={22} />,
+      items: ['Service offerings', 'Availability', 'Rates and packages'],
+    },
+    messages: {
+      title: 'Messages',
+      subtitle: 'Keep conversations with employers and clients in one place.',
+      icon: <MessageSquare size={22} />,
+      items: ['No new conversations yet', 'Your future conversations will appear here.'],
+    },
+    reviews: {
+      title: 'Reviews',
+      subtitle: 'Build trust with feedback from people you work with.',
+      icon: <StarIcon size={22} />,
+      items: ['No reviews yet', 'Complete a project to start collecting feedback.'],
+    },
+    settings: {
+      title: 'Account settings',
+      subtitle: 'Manage your account, privacy, and communication choices.',
+      icon: <Settings size={22} />,
+      items: ['Account information', 'Privacy and visibility', 'Email notifications'],
+    },
+  }[view];
+
+  return (
+    <div className="fade-in min-h-screen bg-[#FAF9F5]">
+      <header className="border-b border-slate-200/60 bg-[#FAF9F5] sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          <button onClick={() => navigateTo('jobs')} className="text-2xl font-extrabold tracking-tight text-slate-900">Joblifyr</button>
+          <AccountMenu navigateTo={navigateTo} user={user} />
+        </div>
+      </header>
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mb-8">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-600">{user?.role === 'employer' ? 'Employer workspace' : 'Professional workspace'}</p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 mt-2">{content.title}</h1>
+          <p className="text-slate-500 mt-2">{content.subtitle}</p>
+        </div>
+        <div className="grid gap-5 md:grid-cols-[1.2fr_0.8fr]">
+          <section className="bg-white border border-slate-200 rounded-2xl p-7 shadow-sm">
+            <div className="flex items-center gap-3 pb-5 border-b border-slate-100">
+              <div className="h-11 w-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">{content.icon}</div>
+              <div>
+                <h2 className="font-bold text-slate-900">{content.title}</h2>
+                <p className="text-xs text-slate-500">{user?.email}</p>
+              </div>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {content.items.map((item) => <div key={item} className="py-5 text-sm text-slate-700">{item}</div>)}
+            </div>
+          </section>
+          <aside className="bg-slate-900 text-white rounded-2xl p-7">
+            <p className="text-xs uppercase tracking-[0.18em] text-indigo-300">Profile strength</p>
+            <p className="text-5xl font-extrabold mt-3">{user?.phone && user?.city ? '80%' : '40%'}</p>
+            <p className="text-sm text-slate-300 mt-3">Add more detail to help the right people discover you.</p>
+            <button onClick={() => navigateTo('profile')} className="mt-7 bg-white text-slate-900 font-bold text-sm px-4 py-3 rounded-xl hover:bg-indigo-50">Open profile</button>
+          </aside>
+        </div>
+      </main>
+    </div>
+  );
+}
+
 /* =================================================================== */
 /* 5. JOB SEARCH & DETAILS VIEW (Matching Image 5)                    */
 /* =================================================================== */
 function JobsView({
   navigateTo,
+  user,
   selectedJobId,
   setSelectedJobId,
   searchTitle,
@@ -1746,15 +1871,15 @@ function JobsView({
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="w-8 h-8 rounded-full bg-slate-800 text-white font-bold flex items-center justify-center text-xs">
-              JD
-            </div>
-            <button
-              onClick={() => alert('Post a Job modal opened!')}
-              className="bg-[#4F52E6] hover:bg-[#4345D9] text-white font-semibold px-4 py-2 rounded-xl text-xs shadow-md"
-            >
-              Post a Job
-            </button>
+            <AccountMenu navigateTo={navigateTo} user={user} />
+            {user?.role === 'employer' && (
+              <button
+                onClick={() => alert('Post a Job modal opened!')}
+                className="bg-[#4F52E6] hover:bg-[#4345D9] text-white font-semibold px-4 py-2 rounded-xl text-xs shadow-md"
+              >
+                Post a Job
+              </button>
+            )}
           </div>
         </div>
       </header>
