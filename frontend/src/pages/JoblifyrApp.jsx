@@ -1265,6 +1265,8 @@ function CompleteProfileView({ navigateTo, user }) {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [cities, setCities] = useState([]);
+  const [citiesLoading, setCitiesLoading] = useState(false);
 
   const countryOptions = [
     'United States', 'Canada', 'United Kingdom', 'Australia', 'Germany', 'France', 'Singapore', 'India', 'Philippines', 'United Arab Emirates', 'Japan', 'South Korea', 'Brazil', 'South Africa', 'Nigeria', 'Kenya', 'Mexico', 'Spain', 'Italy', 'Netherlands',
