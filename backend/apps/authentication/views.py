@@ -1,7 +1,7 @@
 import logging
 import random
 import secrets
-from datetime import timedelta
+from datetime import date, timedelta
 from urllib.parse import urlencode
 
 import requests
@@ -269,15 +269,19 @@ class CompleteProfileAPIView(APIView):
         phone = (request.data.get('phone') or '').strip()
         country = (request.data.get('country') or '').strip()
         city = (request.data.get('city') or '').strip()
-        date_of_birth = request.data.get('date_of_birth')
+        date_of_birth_value = request.data.get('date_of_birth')
         role = request.data.get('role') or user.role or JoblifyrUser.Role.JOB_SEEKER
 
         if not first_name or not last_name:
             return Response({'error': 'First name and last name are required.'}, status=status.HTTP_400_BAD_REQUEST)
         if not phone or not country or not city:
             return Response({'error': 'Phone, country, and city are required.'}, status=status.HTTP_400_BAD_REQUEST)
-        if not date_of_birth:
+        if not date_of_birth_value:
             return Response({'error': 'Date of birth is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            date_of_birth = date.fromisoformat(str(date_of_birth_value))
+        except ValueError:
+            return Response({'error': 'Date of birth must be a valid date.'}, status=status.HTTP_400_BAD_REQUEST)
         if role not in JoblifyrUser.Role.values:
             role = JoblifyrUser.Role.JOB_SEEKER
 
